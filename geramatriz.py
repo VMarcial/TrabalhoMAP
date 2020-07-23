@@ -4,7 +4,6 @@ def geramatriz(tamanho,simetrica):
     if not simetrica:
         for coluna in range(tamanho):
             numeroDeLigacoes = random.randrange(tamanho-1)+1
-            print(numeroDeLigacoes)
             possiveis = [*range(tamanho)]
             del(possiveis[coluna])
             ligacoes = random.sample(possiveis,numeroDeLigacoes)
