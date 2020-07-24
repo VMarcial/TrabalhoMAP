@@ -1,21 +1,22 @@
-import random
+from random import random,sample 
+from time import time
+
 def geramatriz(tamanho,simetrica):
     matriz = [[0 for i in range(tamanho)] for j in range(tamanho)]
     if not simetrica:
         for coluna in range(tamanho):
-            numeroDeLigacoes = int(random.random()*10 % (tamanho-1) +1)
+            numeroDeLigacoes = int(random()*(tamanho-1) % (tamanho-1) +1)
             possiveis = [*range(tamanho)]
             del(possiveis[coluna])
-            ligacoes = random.sample(possiveis,numeroDeLigacoes)
+            ligacoes = sample(possiveis,numeroDeLigacoes)
             for linha in ligacoes:
-                numeroDeLigacoes = 1/numeroDeLigacoes
-                matriz[linha][coluna] = numeroDeLigacoes
+                matriz[linha][coluna] = 1/numeroDeLigacoes
         return matriz
     else:
         for coluna in range(tamanho-1):
-            numeroDeLigacoes = int(random.random()*10 % (tamanho-1-coluna) +1)
+            numeroDeLigacoes = int(random()*(tamanho-1-coluna) % (tamanho-1-coluna) +1)
             possiveis = [*range(coluna+1,tamanho)]
-            ligacoes = random.sample(possiveis,numeroDeLigacoes)
+            ligacoes = sample(possiveis,numeroDeLigacoes)
             for linha in ligacoes:
                 matriz[linha][coluna] = 1
                 matriz[coluna][linha] = 1
@@ -24,8 +25,7 @@ def geramatriz(tamanho,simetrica):
             for linha in range(tamanho):
                 divisor += matriz[linha][coluna]
             for linha in range(tamanho):
-                divisor = 1/divisor
-                matriz[linha][coluna] = divisor
+                matriz[linha][coluna] = 1/divisor
         return matriz
 
 
@@ -46,7 +46,9 @@ def salva(matriz,tamanho):
 tamanho = int(input("Digite o tamanho da matriz:"))
 simetrica = int(input("Simetrica(1/0):"))
 precisao = int(input("Casas depois da virgula:"))
+t = time()
 matriz = geramatriz(tamanho,simetrica)
-print("gerado")
+print(f"gerado , tempo = {time() - t}")
+t = time()
 salva(matriz,tamanho)
-print("salvo")
+print(f"salvo , tempo = {time() - t}")
