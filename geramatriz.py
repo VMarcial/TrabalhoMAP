@@ -3,27 +3,29 @@ def geramatriz(tamanho,simetrica):
     matriz = [[0 for i in range(tamanho)] for j in range(tamanho)]
     if not simetrica:
         for coluna in range(tamanho):
-            numeroDeLigacoes = random.randrange(tamanho-1)+1
+            numeroDeLigacoes = int(random.random()*10 % (tamanho-1) +1)
             possiveis = [*range(tamanho)]
             del(possiveis[coluna])
             ligacoes = random.sample(possiveis,numeroDeLigacoes)
             for linha in ligacoes:
-                matriz[linha][coluna] += 1/numeroDeLigacoes
+                numeroDeLigacoes = 1/numeroDeLigacoes
+                matriz[linha][coluna] = numeroDeLigacoes
         return matriz
     else:
         for coluna in range(tamanho-1):
-            numeroDeLigacoes = random.randrange(tamanho-1-coluna)+1
+            numeroDeLigacoes = int(random.random()*10 % (tamanho-1-coluna) +1)
             possiveis = [*range(coluna+1,tamanho)]
             ligacoes = random.sample(possiveis,numeroDeLigacoes)
             for linha in ligacoes:
-                matriz[linha][coluna] += 1
-                matriz[coluna][linha] += 1
+                matriz[linha][coluna] = 1
+                matriz[coluna][linha] = 1
         for coluna in range(tamanho):
             divisor = 0
             for linha in range(tamanho):
                 divisor += matriz[linha][coluna]
             for linha in range(tamanho):
-                matriz[linha][coluna] /= divisor
+                divisor = 1/divisor
+                matriz[linha][coluna] = divisor
         return matriz
 
 
