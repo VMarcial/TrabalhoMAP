@@ -1,34 +1,29 @@
+#***************************************************#
+#**                                               **#
+#**   Lucas Rodrigues Giacone   11831901          **#
+#**   Exercicio Programa 1: PageRank              **#
+#**   Professor: Saulo Rabello Maciel de Barros   **#
+#**   Turma: 01                                   **#
+#**                                               **#
+#***************************************************#
 from random import random,sample 
 from json import loads as loadList
 from math import sqrt
 from time import time
-def escalona(matriz):
+
+def escalona(matriz,alfa):
     t = time()
     tamanho = len(matriz)
     autovetores = []
-    alfa = 0.15
-
-    for i in matriz:
-        print(i)
-    print()
 
     #Adição de alfa
     for i in range(tamanho):
         for j in range(tamanho):
-            
             matriz[i][j] = (1-alfa)*matriz[i][j] + alfa*(1/tamanho)
-
-
 
     #Subtração da identidade
     for i in range(tamanho):
         matriz[i][i] -= 1 
-
-    for i in matriz:
-        print(i)
-    print()
-
-
 
     #Escalonamento para baixo com valor mais alto da linha
     for i in range(tamanho):
@@ -48,13 +43,13 @@ def escalona(matriz):
                 matriz[j][k] -=  RazaoLin * matriz[i][k]
                 #Zerar elementos menores que 2*10^(-05)
                 matriz[j][k] *= (abs(matriz[j][k])>2e-05)
-        
+
     #Normalização da linha para que todos os elementos da diagonal princiapal tenham valor 1
     for i in range(tamanho-1):
         if matriz[i][i] != 1:
             for j in reversed(range(tamanho)):
                 matriz[i][j] /= matriz[i][i]
-                
+
     #Escalonamento para baixo tirando a ultima coluna:
     for i in range(1,tamanho-1):
         for j in range(i):
@@ -63,54 +58,51 @@ def escalona(matriz):
                 matriz[j][k] -= RazaoLin*matriz[i][k]
 
     #Pega os valores dos autovetores da ultima coluna da matriz
-    print('Autovetores:')
     for i in range(tamanho-1):
         autovetores.append(-1*matriz[i][-1])
     autovetores.append(1)
-    for i in autovetores:
-            print(f'{i:.3f}')
 
     #Normaliza oos valores
     soma = sum(autovetores)
     for i in range(tamanho):
         autovetores[i] /= soma
-    print('Normalizados:')
+    print('Vetores normalizados, Metodo do escalonamento:')
     for i in autovetores:
-            print(f'{i:.3f}')
+            print(f'{i:.6f}')
 
     return time() - t
 
 
-def iterativo(V,L,C,tamanho):
+def iterativo(V,L,C,tamanho,alfa):
     t = time()
     Xnovo = [1/tamanho for i in range(tamanho)]
     Xvelho = [0 for i in range(tamanho)]
 
-    
     #while |Xnovo-Xvelho| > 1e-5:
-    while normaVetor(subtracaoVetor(Xnovo,Xvelho)) > 1e-5:
+    while normaVetor(subtracaoVetor(Xnovo,Xvelho,tamanho)) > 1e-5:
         Xvelho = Xnovo[:]
         Y = [0 for i in range(tamanho)]
         for indice in range(len(V)):
-            Y[L[indice]] += V[indice]*Xvelho[C[indice]]
+            Y[L[indice]] += V[indice]*Xvelho[C[indice]]*(1-alfa)
+        somaAlfa = sum(Xvelho)*alfa/tamanho
+        for i in range(tamanho):
+            Y[i] += somaAlfa
         normY = normaVetor(Y)
-        Xnovo = [Y[i]/normY for i in range(tamanho)]
-
+        Xnovo = [y/normY for y in Y]
 
     autovetores = Xnovo
     soma = sum(autovetores)
     for i in range(tamanho):
         autovetores[i] /= soma
-    print('Normalizados:')
+    print('Vetores normalizados, Metodo iterativo:')
     for i in autovetores:
-            print(f'{i:.3f}')
+            print(f'{i:.6f}')
     return time() - t
 
 
-
-def subtracaoVetor(vecA,vecB):
+def subtracaoVetor(vecA,vecB,tamanho):
     vec = []
-    for i in range(len(vecA)):
+    for i in range(tamanho):
         vec.append(vecA[i] - vecB[i])
     return vec
 
@@ -120,7 +112,6 @@ def normaVetor(vec):
     for valor in vec:
         soma += valor**2
     return sqrt(soma)
-
 
 
 def entradaGrafos():
@@ -141,7 +132,6 @@ def entradaGrafos():
             #criar a matriz normamente para o escalonamento
             matriz[int(elemento)-1][linha] = valor
 
-
     for i in range(tamanho):
         if matriz[i][i] != 0:
             print("Matriz invalida")
@@ -153,15 +143,19 @@ def entradaGrafos():
         if soma < 0.95 :
             print(f"Erro na coluna {i+1}, Verifique a matriz ou tente usar mais casas decimais")
     else:
-        tempo = escalona(matriz)
+        alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
+        tempo = escalona(matriz,alfa)
         print(f"Tempo de escalonamento foi:{tempo}")
-        #Falta implementar o alfa no iterativo
-        tempo = iterativo(V,L,C,tamanho)
+        tempo = iterativo(V,L,C,tamanho,alfa)
         print(f"Tempo iterativo foi:{tempo}")
+
 
 def entradaMatriz():
     matriz = loadList(input("Digite a matriz:\n Ex:\n[[ 0  , 0  , 1, 1/2],\n [ 1/3, 0  , 0, 0  ],\n [ 1/3, 1/2, 0, 1/2],\n [ 1/3, 1/2, 0, 0  ]]\n Seria:\n[[ 0, 0, 1, 0.5],[ 0.33333, 0, 0, 0],[ 0.33333, 0.5, 0, 0.5],[ 0.33333, 0.5, 0, 0]]\nOu seja, entre apenas com numeros decimais.\n>"))
     tamanho = len(matriz)
+    V = []
+    L = []
+    C = []
 
     for i in range(tamanho):
         if matriz[i][i] != 0:
@@ -170,18 +164,34 @@ def entradaMatriz():
         soma = 0
         for j in range(tamanho):
             soma += matriz[j][i]
+
         #Erro de float impede precisao por isso 0.95 envez de 1
         if soma < 0.95 :
             print(f"Erro na coluna {i+1}, Verifique a matriz ou tente usar mais casas decimais")
             return
+
+        for j in range(tamanho):
+            if matriz[i][j] !=0:
+                V.append(matriz[i][j])
+                L.append(i)
+                C.append(j)
+
     else:
-        return escalona(matriz)
+        alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
+        tempo = escalona(matriz,alfa)
+        print(f"Tempo de escalonamento foi:{tempo}")
+        tempo = iterativo(V,L,C,tamanho,alfa)
+        print(f"Tempo iterativo foi:{tempo}")
 
 
 def geraMatriz():
     tamanho = int(input("Digite o tamanho da matriz \n>"))
     simetrica  = int(input("Você deseja que a matriz seja simetrica?\n1-Sim\n2-Não\n>"))%2
     matriz = [[0 for i in range(tamanho)] for j in range(tamanho)]
+    V = []
+    L = []
+    C = []
+
     if not simetrica:
         for coluna in range(tamanho):
             numeroDeLigacoes = int(random()*(tamanho-1) % (tamanho-1) +1)
@@ -190,6 +200,7 @@ def geraMatriz():
             ligacoes = sample(possiveis,numeroDeLigacoes)
             for linha in ligacoes:
                 matriz[linha][coluna] = 1/numeroDeLigacoes
+
     else:
         for coluna in range(tamanho-1):
             numeroDeLigacoes = int(random()*(tamanho-1-coluna) % (tamanho-1-coluna) +1)
@@ -204,7 +215,34 @@ def geraMatriz():
                 divisor += matriz[linha][coluna]
             for linha in range(tamanho):
                 matriz[linha][coluna] /= divisor
-    return escalona(matriz)
+
+    for i in range(tamanho):
+        for j in range(tamanho):
+                if matriz[i][j] !=0:
+                    V.append(matriz[i][j])
+                    L.append(i)
+                    C.append(j)
+
+    print("A matriz gerada foi:")
+    print("[",end = "")
+    for i in range(tamanho):
+        print("[", end = "")
+        for j in range(tamanho):
+            if j == tamanho-1:
+                print(f" {matriz[i][j]:.03f}]", end = "")
+            else:
+                print(f" {matriz[i][j]:.03f},", end = "")
+        if i != tamanho-1:
+            print(",\n ",end="")
+        else:
+            print("]")
+        
+    alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
+    tempo = escalona(matriz,alfa)
+    print(f"Tempo de escalonamento foi:{tempo}")
+    tempo = iterativo(V,L,C,tamanho,alfa)
+    print(f"Tempo iterativo foi:{tempo}")
+    return
 
 
 if __name__ == "__main__":
