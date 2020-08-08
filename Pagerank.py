@@ -174,7 +174,8 @@ def entradaGrafos():
         alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
         tempo = escalona(matriz,alfa)
         print(f"Tempo de escalonamento foi:{tempo}")
-        tempo = iterativo(V,L,C,tamanho,alfa)
+        c = calculaC(matriz)
+        tempo = iterativo(V,L,C,tamanho,alfa,c)
         print(f"Tempo iterativo foi:{tempo}")
 
 
@@ -208,7 +209,8 @@ def entradaMatriz():
         alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
         tempo = escalona(matriz,alfa)
         print(f"Tempo de escalonamento foi:{tempo}")
-        tempo = iterativo(V,L,C,tamanho,alfa)
+        c = calculaC(matriz)
+        tempo = iterativo(V,L,C,tamanho,alfa,c)
         print(f"Tempo iterativo foi:{tempo}")
 
 
