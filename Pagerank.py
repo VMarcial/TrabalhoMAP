@@ -66,14 +66,27 @@ def escalona(matriz,alfa):
     soma = sum(autovetores)
     for i in range(tamanho):
         autovetores[i] /= soma
+
     print('Vetores normalizados, Metodo do escalonamento:')
     for i in autovetores:
-            print(f'{i:.6f}')
+            print(f'{i:.5f}')
 
     return time() - t
 
 
-def iterativo(V,L,C,tamanho,alfa):
+def calculaC (matriz):
+    c = matriz[0][0]
+    for i in range(len(matriz)):
+        for j in range(len(matriz[0])):
+            if matriz[i][j] < c:
+                c = matriz[i][j]
+
+    c = 1.0 - 2.0 * c
+
+    return c
+
+
+def iterativo(V,L,C,tamanho,alfa,c):
     t = time()
     Xnovo = [1/tamanho for i in range(tamanho)]
     Xvelho = [0 for i in range(tamanho)]
@@ -96,7 +109,7 @@ def iterativo(V,L,C,tamanho,alfa):
         autovetores[i] /= soma
     print('Vetores normalizados, Metodo iterativo:')
     for i in autovetores:
-            print(f'{i:.6f}')
+            print(f'{i:.5f}')
     return time() - t
 
 
@@ -118,30 +131,45 @@ def entradaGrafos():
     V = []
     L = []
     C = []
-    tamanho = int(input("Digite o numero de paginas:\n>"))
+    while True:
+        try:
+            tamanho = int(input("Digite o numero de paginas:\n>"))
+            if tamanho > 1:
+                break
+            else:
+                print("O tamanho deve ser maior que 1")
+        except ValueError:
+            print("Entre com um numero inteiro para o numero de paginas")
     matriz = [[0 for i in range(tamanho)] for j in range(tamanho)]
     print("Como entrar com os grafos\n Ex: A pagina 1 referencia as paginas 2, 4 e 5 entrar 2, 4, 5.")
     for linha in range(tamanho):
-        colunas = input(f"Entre com a(s) referencia(s) da pagina {linha+1}\n>").split(",")
-        valor = 1/len(colunas)
-
-        for elemento in colunas:
-            V.append(valor)
-            L.append(int(elemento)-1)
-            C.append(linha)
-            #criar a matriz normamente para o escalonamento
-            matriz[int(elemento)-1][linha] = valor
-
-    for i in range(tamanho):
-        if matriz[i][i] != 0:
-            print("Matriz invalida")
-            return
-        soma = 0
-        for j in range(tamanho):
-            soma += matriz[j][i]
-        #Erro de float impede precisao por isso 0.95 envez de 1
-        if soma < 0.95 :
-            print(f"Erro na coluna {i+1}, Verifique a matriz ou tente usar mais casas decimais")
+        while True:
+            colunas = input(f"Entre com a(s) referencia(s) da pagina {linha+1}\n>").split(",")
+            if str(linha+1) in colunas:
+                print("Grafo invalido, um site não pode apontar pra ele mesmo!")
+            else:
+                for i in range(len(colunas)):
+                    if colunas[i] in colunas[i+1:]:
+                        print("Um site não pode apontar duas vezes para o mesmo site")
+                        break
+                else:
+                    valor = 1/len(colunas)
+                    for elemento in colunas:
+                        try:
+                            if int(elemento) > tamanho:
+                                print("Grafo invalido, um site não pode apontar pra uma pagina que não existe!")
+                                break
+                        except Exception:
+                            print("Os valores devem ser inteiros!")
+                            break
+                        V.append(valor)
+                        L.append(int(elemento)-1)
+                        C.append(linha)
+                        #criar a matriz normamente para o escalonamento
+                        matriz[int(elemento)-1][linha] = valor
+                    else:
+                        break
+            print("Tente novamente")
     else:
         alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
         tempo = escalona(matriz,alfa)
@@ -223,34 +251,42 @@ def geraMatriz():
                     L.append(i)
                     C.append(j)
 
-    print("A matriz gerada foi:")
-    print("[",end = "")
-    for i in range(tamanho):
-        print("[", end = "")
-        for j in range(tamanho):
-            if j == tamanho-1:
-                print(f" {matriz[i][j]:.03f}]", end = "")
+    imprime = int(input("Você deseja imprimir a matriz?\n1-Sim\n2-Não\n>"))%2
+    if imprime:
+        print("A matriz gerada foi:")
+        print("[",end = "")
+        for i in range(tamanho):
+            print("[", end = "")
+            for j in range(tamanho):
+                if j == tamanho-1:
+                    print(f" {matriz[i][j]:.03f}]", end = "")
+                else:
+                    print(f" {matriz[i][j]:.03f},", end = "")
+            if i != tamanho-1:
+                print(",\n ",end="")
             else:
-                print(f" {matriz[i][j]:.03f},", end = "")
-        if i != tamanho-1:
-            print(",\n ",end="")
-        else:
-            print("]")
-        
+                print("]")
+
     alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
+    c = calculaC(matriz)
     tempo = escalona(matriz,alfa)
     print(f"Tempo de escalonamento foi:{tempo}")
-    tempo = iterativo(V,L,C,tamanho,alfa)
+    tempo = iterativo(V,L,C,tamanho,alfa,c)
     print(f"Tempo iterativo foi:{tempo}")
     return
 
 
 if __name__ == "__main__":
     print("Entrar com: \n1-Mapa de grafos \n2-Matriz\n3-Gerar matriz aleatoria valida")
-    escolha = int(input('>'))
-    if escolha == 1:
+    while True:
+        escolha = input('>')
+        if escolha in ['1','2','3']:
+            break
+        else:
+            print("Entre com uma opção valida!")
+    if escolha == '1':
         entradaGrafos()
-    if escolha == 2:
+    if escolha == '2':
         entradaMatriz()
-    if escolha == 3:
+    if escolha == '3':
         geraMatriz()
