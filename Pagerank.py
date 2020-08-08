@@ -7,7 +7,6 @@
 #**                                               **#
 #***************************************************#
 from random import random,sample 
-from json import loads as loadList
 from math import sqrt
 from time import time
 
@@ -74,29 +73,19 @@ def escalona(matriz,alfa):
     return time() - t
 
 
-def calculaC (matriz):
-    c = matriz[0][0]
-    for i in range(len(matriz)):
-        for j in range(len(matriz[0])):
-            if matriz[i][j] < c:
-                c = matriz[i][j]
-
-    c = 1.0 - 2.0 * c
-
-    return c
-
-
-def iterativo(V,L,C,tamanho,alfa,c):
+def iterativo(V,L,C,tamanho,alfa):
     t = time()
+    c = (1 - 2 * min(V))*(1-alfa)+ alfa/tamanho
+    c = c/(1-c)
     Xnovo = [1/tamanho for i in range(tamanho)]
     Xvelho = [0 for i in range(tamanho)]
 
     #while |Xnovo-Xvelho| > 1e-5:
-    while normaVetor(subtracaoVetor(Xnovo,Xvelho,tamanho)) > 1e-5:
+    while c*normaVetor(subtracaoVetor(Xnovo,Xvelho,tamanho)) > 1e-5:
         Xvelho = Xnovo[:]
         Y = [0 for i in range(tamanho)]
         for indice in range(len(V)):
-            Y[L[indice]] += V[indice]*Xvelho[C[indice]]*(1-alfa)
+            Y[L[indice]] += V[indice]*Xvelho[C[indice]] * (1-alfa)
         somaAlfa = sum(Xvelho)*alfa/tamanho
         for i in range(tamanho):
             Y[i] += somaAlfa
@@ -159,7 +148,7 @@ def entradaGrafos():
                             if int(elemento) > tamanho:
                                 print("Grafo invalido, um site não pode apontar pra uma pagina que não existe!")
                                 break
-                        except Exception:
+                        except ValueError:
                             print("Os valores devem ser inteiros!")
                             break
                         V.append(valor)
@@ -174,14 +163,28 @@ def entradaGrafos():
         alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
         tempo = escalona(matriz,alfa)
         print(f"Tempo de escalonamento foi:{tempo}")
-        c = calculaC(matriz)
-        tempo = iterativo(V,L,C,tamanho,alfa,c)
+        tempo = iterativo(V,L,C,tamanho,alfa)
         print(f"Tempo iterativo foi:{tempo}")
 
 
 def entradaMatriz():
-    matriz = loadList(input("Digite a matriz:\n Ex:\n[[ 0  , 0  , 1, 1/2],\n [ 1/3, 0  , 0, 0  ],\n [ 1/3, 1/2, 0, 1/2],\n [ 1/3, 1/2, 0, 0  ]]\n Seria:\n[[ 0, 0, 1, 0.5],[ 0.33333, 0, 0, 0],[ 0.33333, 0.5, 0, 0.5],[ 0.33333, 0.5, 0, 0]]\nOu seja, entre apenas com numeros decimais.\n>"))
+    matriz = input("Digite a matriz:\n Ex:\n[[ 0  , 0  , 1, 1/2],\n [ 1/3, 0  , 0, 0  ],\n [ 1/3, 1/2, 0, 1/2],\n [ 1/3, 1/2, 0, 0  ]]\n Seria:\n[[ 0, 0, 1, 1/2],[ 1/3, 0, 0, 0],[ 1/3, 1/2, 0, 1/2],[ 1/3, 1/2, 0, 0]]\nOu\n[[ 0, 0, 1, 0.5],[ 0.33333, 0, 0, 0],[ 0.33333, 0.5, 0, 0.5],[ 0.33333, 0.5, 0, 0]]\nOu seja, entre apenas com numeros decimais ou frações.\n>")
+    matriz = matriz.replace(" ", "")
+    matriz = [I+']' for I in matriz.split(']')[:-2]]
     tamanho = len(matriz)
+    matrizFinal = [[0 for i in range(tamanho)] for j in range(tamanho)]
+    for i in range(len(matriz)):
+        matriz[i] = matriz[i][2:-1]
+    for indiceLin,linha in enumerate(matriz):
+        linha = linha.split(",")
+        for indiceCol,elemento in enumerate(linha):
+            if "/" in elemento:
+                elemento = elemento.split("/")
+                matrizFinal[indiceLin][indiceCol] = int(elemento[0])/int(elemento[1])
+            else:
+                matrizFinal[indiceLin][indiceCol] = float(elemento)
+    matriz = matrizFinal
+
     V = []
     L = []
     C = []
@@ -209,12 +212,12 @@ def entradaMatriz():
         alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
         tempo = escalona(matriz,alfa)
         print(f"Tempo de escalonamento foi:{tempo}")
-        c = calculaC(matriz)
-        tempo = iterativo(V,L,C,tamanho,alfa,c)
+        tempo = iterativo(V,L,C,tamanho,alfa)
         print(f"Tempo iterativo foi:{tempo}")
 
 
 def geraMatriz():
+    t = time()
     tamanho = int(input("Digite o tamanho da matriz \n>"))
     simetrica  = int(input("Você deseja que a matriz seja simetrica?\n1-Sim\n2-Não\n>"))%2
     matriz = [[0 for i in range(tamanho)] for j in range(tamanho)]
@@ -252,7 +255,7 @@ def geraMatriz():
                     V.append(matriz[i][j])
                     L.append(i)
                     C.append(j)
-
+    print(f"\nTempo para gerar a matriz foi:{time()-t}\n")
     imprime = int(input("Você deseja imprimir a matriz?\n1-Sim\n2-Não\n>"))%2
     if imprime:
         print("A matriz gerada foi:")
@@ -268,12 +271,10 @@ def geraMatriz():
                 print(",\n ",end="")
             else:
                 print("]")
-
     alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
-    c = calculaC(matriz)
     tempo = escalona(matriz,alfa)
     print(f"Tempo de escalonamento foi:{tempo}")
-    tempo = iterativo(V,L,C,tamanho,alfa,c)
+    tempo = iterativo(V,L,C,tamanho,alfa)
     print(f"Tempo iterativo foi:{tempo}")
     return
 
