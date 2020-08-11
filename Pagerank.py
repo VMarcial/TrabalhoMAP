@@ -227,7 +227,8 @@ def geraMatriz():
 
     if not simetrica:
         for coluna in range(tamanho):
-            numeroDeLigacoes = int(random()*(tamanho-1) % (tamanho-1) +1)
+            # numeroDeLigacoes = int(random()*(tamanho-1) % (tamanho-1) +1)
+            numeroDeLigacoes = int(random()*10 % 10 +1)
             possiveis = [*range(tamanho)]
             del(possiveis[coluna])
             ligacoes = sample(possiveis,numeroDeLigacoes)
@@ -236,7 +237,8 @@ def geraMatriz():
 
     else:
         for coluna in range(tamanho-1):
-            numeroDeLigacoes = int(random()*(tamanho-1-coluna) % (tamanho-1-coluna) +1)
+            # numeroDeLigacoes = int(random()*(tamanho-1-coluna) % (tamanho-1-coluna) +1)
+            numeroDeLigacoes = (coluna > 11)*int(random()*10 % 10 +1) + (coluna<11)*int(random()*(tamanho-1-coluna) % (tamanho-1-coluna) +1)
             possiveis = [*range(coluna+1,tamanho)]
             ligacoes = sample(possiveis,numeroDeLigacoes)
             for linha in ligacoes:

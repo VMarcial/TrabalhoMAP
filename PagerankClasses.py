@@ -11,99 +11,116 @@ from math import sqrt
 from time import time
 
 class pageRank():
-    def __init__(self,tamanho,simetrica,alfa,display = False):
+    def __init__(self,tamanho,simetrica,alfa,vezesEscalonado = 0,vezesIterativo = 0,display = False):
         self.tamanho = tamanho
         self.simetrica = simetrica
         self.alfa = alfa
         self.display = display
+        self.vezesEscalonado = vezesEscalonado
+        self.vezesIterativo =  vezesIterativo
 
 
-    def escalona(self,matriz):
-        alfa = self.alfa
+    def escalona(self):
         t = time()
-        tamanho = len(matriz)
-        autovetores = []
+        alfa = self.alfa
+        print(len(self.matriz))
+        for i in range(self.vezesEscalonado):
+            matriz = self.matriz[:]
+            tamanho = len(matriz)
+            autovetores = []
 
-        #Adição de alfa
-        for i in range(tamanho):
-            for j in range(tamanho):
-                matriz[i][j] = (1-alfa)*matriz[i][j] + alfa*(1/tamanho)
+            #Adição de alfa
+            for i in range(tamanho):
+                for j in range(tamanho):
+                    matriz[i][j] = (1-alfa)*matriz[i][j] + alfa*(1/tamanho)
 
-        #Subtração da identidade
-        for i in range(tamanho):
-            matriz[i][i] -= 1 
+            #Subtração da identidade
+            for i in range(tamanho):
+                matriz[i][i] -= 1 
 
-        #Escalonamento para baixo com valor mais alto da linha
-        for i in range(tamanho):
-            coluna = []
-            for j in range(i,tamanho):
-                coluna.append(matriz[j][i])
+            #Escalonamento para baixo com valor mais alto da linha
+            for i in range(tamanho):
+                coluna = []
+                for j in range(i,tamanho):
+                    coluna.append(matriz[j][i])
 
-            if max(coluna) > -min(coluna):
-                indiceColMax = coluna.index(max(coluna))
-            else:
-                indiceColMax = coluna.index(min(coluna))
-            matriz[i][:] , matriz[indiceColMax+i][:] = matriz[indiceColMax+i][:] , matriz[i][:]
+                if max(coluna) > -min(coluna):
+                    indiceColMax = coluna.index(max(coluna))
+                else:
+                    indiceColMax = coluna.index(min(coluna))
+                matriz[i][:] , matriz[indiceColMax+i][:] = matriz[indiceColMax+i][:] , matriz[i][:]
 
-            for j in range(i+1,tamanho):
-                RazaoLin = matriz[j][i]/matriz[i][i]
-                for k in range(tamanho):
-                    matriz[j][k] -=  RazaoLin * matriz[i][k]
-                    #Zerar elementos menores que 2*10^(-05)
-                    matriz[j][k] *= (abs(matriz[j][k])>2e-05)
+                for j in range(i+1,tamanho):
+                    RazaoLin = matriz[j][i]/matriz[i][i]
+                    for k in range(tamanho):
+                        matriz[j][k] -=  RazaoLin * matriz[i][k]
+                        #Zerar elementos menores que 2*10^(-05)
+                        matriz[j][k] *= (abs(matriz[j][k])>2e-05)
 
-        #Normalização da linha para que todos os elementos da diagonal princiapal tenham valor 1
-        for i in range(tamanho-1):
-            if matriz[i][i] != 1:
-                for j in reversed(range(tamanho)):
-                    matriz[i][j] /= matriz[i][i]
+            #Normalização da linha para que todos os elementos da diagonal princiapal tenham valor 1
+            for i in range(tamanho-1):
+                if matriz[i][i] != 1:
+                    for j in reversed(range(tamanho)):
+                        matriz[i][j] /= matriz[i][i]
 
-        #Escalonamento para baixo tirando a ultima coluna:
-        for i in range(1,tamanho-1):
-            for j in range(i):
-                RazaoLin = matriz[j][i]/matriz[i][i]
-                for k in range(i,tamanho):
-                    matriz[j][k] -= RazaoLin*matriz[i][k]
+            #Escalonamento para baixo tirando a ultima coluna:
+            for i in range(1,tamanho-1):
+                for j in range(i):
+                    RazaoLin = matriz[j][i]/matriz[i][i]
+                    for k in range(i,tamanho):
+                        matriz[j][k] -= RazaoLin*matriz[i][k]
 
-        #Pega os valores dos autovetores da ultima coluna da matriz
-        for i in range(tamanho-1):
-            autovetores.append(-1*matriz[i][-1])
-        autovetores.append(1)
+            #Pega os valores dos autovetores da ultima coluna da matriz
+            for i in range(tamanho-1):
+                autovetores.append(-1*matriz[i][-1])
+            autovetores.append(1)
 
-        #Normaliza oos valores
-        soma = sum(autovetores)
-        for i in range(tamanho):
-            autovetores[i] /= soma
+            #Normaliza oos valores
+            soma = sum(autovetores)
+            for i in range(tamanho):
+                autovetores[i] /= soma
+        if self.vezesEscalonado:
+            return (time() - t)/self.vezesEscalonado
+        else:
+            return 0
 
-        return time() - t
 
-
-    def iterativo(self,V,L,C):
+    def iterativo(self):
         alfa = self.alfa
         tamanho = self.tamanho
         t = time()
-        c = (1 - 2 * min(V))*(1-alfa)+ alfa/tamanho
-        c = c/(1-c)
-        Xnovo = [1/tamanho for i in range(tamanho)]
-        Xvelho = [0 for i in range(tamanho)]
+        print(tamanho)
+        for i in range(self.vezesIterativo):
+            V = self.V[:]
+            L = self.L[:]
+            C = self.C[:]
 
-        #while |Xnovo-Xvelho| > 1e-5:
-        while c*self.normaVetor(self.subtracaoVetor(Xnovo,Xvelho)) > 1e-5:
-            Xvelho = Xnovo[:]
-            Y = [0 for i in range(tamanho)]
-            for indice in range(len(V)):
-                Y[L[indice]] += V[indice]*Xvelho[C[indice]] * (1-alfa)
-            somaAlfa = sum(Xvelho)*alfa/tamanho
+            c = (1 - 2 * min(V))*(1-alfa)+ alfa/tamanho
+            c = c/(1-c)
+            Xnovo = [1/tamanho for i in range(tamanho)]
+            Xvelho = [0 for i in range(tamanho)]
+
+            #while |Xnovo-Xvelho| > 1e-5:
+            while c*self.normaVetor(self.subtracaoVetor(Xnovo,Xvelho)) > 1e-5:
+                Xvelho = Xnovo[:]
+                Y = [0 for i in range(tamanho)]
+                for indice in range(len(V)):
+                    Y[L[indice]] += V[indice]*Xvelho[C[indice]] * (1-alfa)
+                somaAlfa = sum(Xvelho)*alfa/tamanho
+                for i in range(tamanho):
+                    Y[i] += somaAlfa
+                normY = self.normaVetor(Y)
+                Xnovo = [y/normY for y in Y]
+
+            autovetores = Xnovo
+            soma = sum(autovetores)
             for i in range(tamanho):
-                Y[i] += somaAlfa
-            normY = self.normaVetor(Y)
-            Xnovo = [y/normY for y in Y]
+                autovetores[i] /= soma
 
-        autovetores = Xnovo
-        soma = sum(autovetores)
-        for i in range(tamanho):
-            autovetores[i] /= soma
-        return time() - t
+        if self.vezesIterativo:
+            return (time() - t)/self.vezesIterativo
+        else:
+            return 0
 
 
     def subtracaoVetor(self,vecA,vecB):
@@ -184,8 +201,13 @@ class pageRank():
                     print(",\n ",end="")
                 else:
                     print("]")
-        tempo = [0,0]
-        tempo[0] = self.escalona(matriz)
-        tempo[1] = self.iterativo(V,L,C)
-        return tempo
 
+        self.matriz = matriz
+        self.V = V
+        self.L = L
+        self.C = C
+
+        tempo = [0,0]
+        tempo[0] = self.escalona()
+        tempo[1] = self.iterativo()
+        return tempo

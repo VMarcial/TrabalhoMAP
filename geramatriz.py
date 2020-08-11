@@ -25,7 +25,7 @@ def geramatriz(tamanho,simetrica):
             for linha in range(tamanho):
                 divisor += matriz[linha][coluna]
             for linha in range(tamanho):
-                matriz[linha][coluna] = 1/divisor
+                matriz[linha][coluna] /= divisor
         return matriz
 
 
