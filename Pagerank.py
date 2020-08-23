@@ -66,11 +66,14 @@ def escalona(matriz,alfa):
     for i in range(tamanho):
         autovetores[i] /= soma
 
-    print('Vetores normalizados, Metodo do escalonamento:')
-    for i in autovetores:
-            print(f'{i:.5f}')
-
-    return time() - t
+    t = time() - t
+    imprime = int(input("Você deseja imprimir o autovetor?\n1-Sim\n2-Não\n>"))%2
+    if imprime:
+        print('Vetor normalizados, Metodo do escalonamento:')
+        for i in autovetores:
+                print(f'{i:.5f}')
+    
+    return t
 
 
 def iterativo(V,L,C,tamanho,alfa):
@@ -96,10 +99,13 @@ def iterativo(V,L,C,tamanho,alfa):
     soma = sum(autovetores)
     for i in range(tamanho):
         autovetores[i] /= soma
-    print('Vetores normalizados, Metodo iterativo:')
-    for i in autovetores:
-            print(f'{i:.5f}')
-    return time() - t
+    t = time() - t
+    imprime = int(input("Você deseja imprimir o autovetor?\n1-Sim\n2-Não\n>"))%2
+    if imprime:
+        print('Vetor normalizados, Metodo iterativo:')
+        for i in autovetores:
+                print(f'{i:.5f}')
+    return t
 
 
 def subtracaoVetor(vecA,vecB,tamanho):
@@ -217,15 +223,22 @@ def entradaMatriz():
 
 
 def geraMatriz():
-    t = time()
-    tamanho = int(input("Digite o tamanho da matriz \n>"))
-    simetrica  = int(input("Você deseja que a matriz seja simetrica?\n1-Sim\n2-Não\n>"))%2
-    matriz = [[0 for i in range(tamanho)] for j in range(tamanho)]
+    caciqueTribo = int(input("Você deseja que a matriz seja cacique-tribo?\n1-Sim\n2-Não\n>"))%2
+    if caciqueTribo:
+        ordem = int(input("Digite a ordem da cacique-tribo \n>"))
+        t = time()
+        tamanho = int(ordem*(ordem+3)/2)
+        matriz = [([0]*tamanho) for i in range(tamanho)]
+    else:
+        tamanho = int(input("Digite o tamanho da matriz \n>"))
+        t = time()
+        matriz = [[0 for i in range(tamanho)] for j in range(tamanho)]
+    # simetrica  = int(input("Você deseja que a matriz seja simetrica?\n1-Sim\n2-Não\n>"))%2
     V = []
     L = []
     C = []
 
-    if not simetrica:
+    if not caciqueTribo:
         for coluna in range(tamanho):
             # numeroDeLigacoes = int(random()*(tamanho-1) % (tamanho-1) +1)
             numeroDeLigacoes = int(random()*10 % 10 +1)
@@ -236,20 +249,27 @@ def geraMatriz():
                 matriz[linha][coluna] = 1/numeroDeLigacoes
 
     else:
-        for coluna in range(tamanho-1):
-            # numeroDeLigacoes = int(random()*(tamanho-1-coluna) % (tamanho-1-coluna) +1)
-            numeroDeLigacoes = (coluna > 11)*int(random()*10 % 10 +1) + (coluna<11)*int(random()*(tamanho-1-coluna) % (tamanho-1-coluna) +1)
-            possiveis = [*range(coluna+1,tamanho)]
-            ligacoes = sample(possiveis,numeroDeLigacoes)
-            for linha in ligacoes:
-                matriz[linha][coluna] = 1
-                matriz[coluna][linha] = 1
-        for coluna in range(tamanho):
-            divisor = 0
-            for linha in range(tamanho):
-                divisor += matriz[linha][coluna]
-            for linha in range(tamanho):
-                matriz[linha][coluna] /= divisor
+        cont = 0
+        cacique = []
+        for i in range(ordem):
+            cacique.append(cont)
+            for j in range(i+1):
+                matriz[cont][cont+j+1]=1
+                matriz[cont+j+1][cont]=1
+                for k in range(j):
+                    matriz[cont+k+1][cont+j+1]=1
+                    matriz[cont+j+1][cont+k+1]=1
+            cont+=i+2
+        for i in cacique:
+            for j in cacique:
+                matriz[i][j]=int(i!=j)
+                matriz[j][i]=int(i!=j)
+        for i in range(tamanho):
+            soma = 0
+            for j in range (tamanho):
+                soma += matriz[j][i]
+            for j in range (tamanho):
+                matriz[j][i]/=soma
 
     for i in range(tamanho):
         for j in range(tamanho):
