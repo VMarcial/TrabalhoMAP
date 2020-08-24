@@ -72,7 +72,7 @@ def escalona(matriz,alfa):
         print('Vetor normalizados, Metodo do escalonamento:')
         for i in autovetores:
                 print(f'{i:.5f}')
-    
+
     return t
 
 
@@ -223,7 +223,7 @@ def entradaMatriz():
 
 
 def geraMatriz():
-    caciqueTribo = int(input("Você deseja que a matriz seja cacique-tribo?\n1-Sim\n2-Não\n>"))%2
+    caciqueTribo = int(input("Você deseja que a matriz seja cacique-tribo da tarefa 2?\n1-Sim\n2-Não\n>"))%2
     if caciqueTribo:
         ordem = int(input("Digite a ordem da cacique-tribo \n>"))
         t = time()
