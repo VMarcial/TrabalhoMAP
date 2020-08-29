@@ -146,6 +146,7 @@ def printRanking(vecA,vecB):
     for i in ranking:
         print(f'  {i[0]+1}\t    {i[1]:.5f}\t      {i[2]:.5f}')
 
+
 def entradaGrafos():
     V = []
     L = []
