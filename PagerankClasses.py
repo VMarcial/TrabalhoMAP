@@ -166,6 +166,8 @@ class pageRank():
         else:
             ordem = tamanho
             tamanho = int(ordem*(ordem+3)/2)
+            self.tamanho = tamanho
+            matriz = [([0]*tamanho) for i in range(tamanho)]
             cont = 0
             cacique = []
             for i in range(ordem):

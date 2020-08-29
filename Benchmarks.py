@@ -2,9 +2,9 @@ import PagerankClasses
 import json
 from multiprocessing import Pool
 
-simetrica = False
+simetrica = True
 multiplicadorIterativo = 50
-multiplicadorEscalonamento = 0
+multiplicadorEscalonamento = 2
 
 def pegaTempo(lista):
     dados = []
@@ -38,7 +38,7 @@ if __name__ == "__main__":
         dadosEscalona.append([i[0],i[1]])
         dadosIterativo.append([i[0],i[2]])
 
-    with open(f'0.json', 'w') as outfile:
+    with open(f'Tarefa2Escalonado.json', 'w') as outfile:
         json.dump(dadosEscalona, outfile)
-    with open(f'Tarefa2.json', 'w') as outfile:
+    with open(f'Tarefa2Iterativo.json', 'w') as outfile:
         json.dump(dadosIterativo, outfile)
