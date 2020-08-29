@@ -67,17 +67,20 @@ def escalona(matriz,alfa):
         autovetores[i] /= soma
 
     t = time() - t
-    imprime = int(input("Você deseja imprimir o autovetor?\n1-Sim\n2-Não\n>"))%2
+    imprime = int(input("Você deseja imprimir o autovetor do metodo escalonamento?\n1-Sim\n2-Não\n>"))%2
     if imprime:
-        ranking = []
-        for i in range(len(autovetores)):
-            ranking.append([i, autovetores[i]])
-        ranking = sorted(ranking, key = lambda k: k[1], reverse=True)
-        print('Vetor normalizados, Metodo escalonamento:')
-        for i in ranking:
-            print(i[0]+1, f'{i[1]:.5f}')
+        print('Vetor normalizado, Metodo iterativo:')
+        for i in autovetores:
+            print(i)
+        # ranking = []
+        # for i in range(len(autovetores)):
+        #     ranking.append([i, autovetores[i]])
+        # ranking = sorted(ranking, key = lambda k: k[1], reverse=True)
+        # print('Vetor normalizados, Metodo escalonamento:')
+        # for i in ranking:
+        #     print(i[0]+1, f'{i[1]:.5f}')
 
-    return t
+    return t,autovetores
 
 
 def iterativo(V,L,C,tamanho,alfa):
@@ -104,16 +107,19 @@ def iterativo(V,L,C,tamanho,alfa):
     for i in range(tamanho):
         autovetores[i] /= soma
     t = time() - t
-    imprime = int(input("Você deseja imprimir o autovetor?\n1-Sim\n2-Não\n>"))%2
+    imprime = int(input("Você deseja imprimir o autovetor do metodo iterativo?\n1-Sim\n2-Não\n>"))%2
     if imprime:
-        ranking = []
-        for i in range(len(autovetores)):
-            ranking.append([i, autovetores[i]])
-        ranking = sorted(ranking, key = lambda k: k[1], reverse=True)
-        print('Vetor normalizados, Metodo iterativo:')
-        for i in ranking:
-            print(i[0]+1, f'{i[1]:.5f}')
-    return t
+        print('Vetor normalizado, Metodo iterativo:')
+        for i in autovetores:
+            print(i)
+        # ranking = []
+        # for i in range(len(autovetores)):
+        #     ranking.append([i, autovetores[i]])
+        # ranking = sorted(ranking, key = lambda k: k[1], reverse=True)
+        # print('Vetor normalizados, Metodo iterativo:')
+        # for i in ranking:
+        #     print(i[0]+1, f'{i[1]:.5f}')
+    return t,autovetores
 
 
 def subtracaoVetor(vecA,vecB,tamanho):
@@ -129,6 +135,16 @@ def normaVetor(vec):
         soma += valor**2
     return sqrt(soma)
 
+
+def printRanking(vecA,vecB):
+    ranking = []
+    for i in range(len(vecA)):
+        ranking.append([i, vecA[i], vecB[i]])
+    ranking = sorted(ranking, key = lambda k: k[1], reverse=True)
+    print('Rank das paginas:')
+    print('Pagina\tValor Escalonado  Valor Iterativo')
+    for i in ranking:
+        print(f'  {i[0]+1}\t    {i[1]:.5f}\t      {i[2]:.5f}')
 
 def entradaGrafos():
     V = []
@@ -175,10 +191,13 @@ def entradaGrafos():
             print("Tente novamente")
     else:
         alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
-        tempo = escalona(matriz,alfa)
+        tempo,vecA = escalona(matriz,alfa)
         print(f"Tempo de escalonamento foi:{tempo}")
-        tempo = iterativo(V,L,C,tamanho,alfa)
+        tempo,vecB = iterativo(V,L,C,tamanho,alfa)
         print(f"Tempo iterativo foi:{tempo}")
+    imprime = int(input('Deseja imprimir o ranking das paginas?\n1-Sim\n2-Não\n>'))%2
+    if imprime:
+        printRanking(vecA,vecB) 
 
 
 def entradaMatriz():
@@ -224,11 +243,13 @@ def entradaMatriz():
 
     else:
         alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
-        tempo = escalona(matriz,alfa)
+        tempo,vecA = escalona(matriz,alfa)
         print(f"Tempo de escalonamento foi:{tempo}")
-        tempo = iterativo(V,L,C,tamanho,alfa)
+        tempo,vecB = iterativo(V,L,C,tamanho,alfa)
         print(f"Tempo iterativo foi:{tempo}")
-
+    imprime = int(input('Deseja imprimir o ranking das paginas?\n1-Sim\n2-Não\n>'))%2
+    if imprime:
+        printRanking(vecA,vecB) 
 
 def geraMatriz():
     caciqueTribo = int(input("Você deseja que a matriz seja cacique-tribo da tarefa 2?\n1-Sim\n2-Não\n>"))%2
@@ -311,10 +332,13 @@ def geraMatriz():
             else:
                 print("]")
     alfa = float(input("Digite o valor de alfa:\n Ex: 15% = 0.15\n>"))
-    tempo = escalona(matriz,alfa)
+    tempo,vecA = escalona(matriz,alfa)
     print(f"Tempo de escalonamento foi:{tempo}")
-    tempo = iterativo(V,L,C,tamanho,alfa)
+    tempo,vecB = iterativo(V,L,C,tamanho,alfa)
     print(f"Tempo iterativo foi:{tempo}")
+    imprime = int(input('Deseja imprimir o ranking das paginas?\n1-Sim\n2-Não\n>'))%2
+    if imprime:
+        printRanking(vecA,vecB) 
     return
 
 
