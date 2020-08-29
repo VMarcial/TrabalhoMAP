@@ -69,9 +69,13 @@ def escalona(matriz,alfa):
     t = time() - t
     imprime = int(input("Você deseja imprimir o autovetor?\n1-Sim\n2-Não\n>"))%2
     if imprime:
-        print('Vetor normalizados, Metodo do escalonamento:')
-        for i in autovetores:
-                print(f'{i:.5f}')
+        ranking = []
+        for i in range(len(autovetores)):
+            ranking.append([i, autovetores[i]])
+        ranking = sorted(ranking, key = lambda k: k[1], reverse=True)
+        print('Vetor normalizados, Metodo escalonamento:')
+        for i in ranking:
+            print(i[0]+1, f'{i[1]:.5f}')
 
     return t
 
@@ -102,9 +106,13 @@ def iterativo(V,L,C,tamanho,alfa):
     t = time() - t
     imprime = int(input("Você deseja imprimir o autovetor?\n1-Sim\n2-Não\n>"))%2
     if imprime:
+        ranking = []
+        for i in range(len(autovetores)):
+            ranking.append([i, autovetores[i]])
+        ranking = sorted(ranking, key = lambda k: k[1], reverse=True)
         print('Vetor normalizados, Metodo iterativo:')
-        for i in autovetores:
-                print(f'{i:.5f}')
+        for i in ranking:
+            print(i[0]+1, f'{i[1]:.5f}')
     return t
 
 
